@@ -11,8 +11,12 @@ incompleteNodes = {}
 tree = Tree()
 
 
-def leaves_first(value):
+def leaves_first(value: str):
     return len(value.split(" "))
+
+
+def give_your_name(node: Node):
+    print(node.name)
 
 
 def creating_nodes_from_file(file):
@@ -96,3 +100,5 @@ for name, node in nodes.items():
     print(node.tostring())
 
 print("Root is :", tree.root.name)
+
+tree.depth_first_search_from_root(give_your_name)
