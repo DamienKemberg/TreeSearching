@@ -29,28 +29,25 @@ def creating_nodes_from_file(file):
 
         node_name = args[0]
 
-        nodes[node_name] = Node(node_name)
-
+        nodes[node_name] = Node(node_name, args[1:] if len(args) > 1 else None)
 
         if len(args) > 1:
             node_children_name = args[1:]
 
-            for child in node_children_name:
+            for idx, child in enumerate(node_children_name):
 
                 # If the child have already been created
-                if nodes.get(child) and nodes[node_name].children:
-                    nodes[node_name].children.append(nodes[child])
-                elif nodes.get(child):
-                    nodes[node_name].children = [nodes[child]]
+                if nodes.get(child):
+                    nodes[node_name].children[idx] = nodes[child]
 
                 # Else, we wait the end to complete the node
                 else:
 
                     if incompleteNodes.get(node_name):
                         children = incompleteNodes[node_name]
-                        children.append(child)
+                        children.append([child, idx])
                     else:
-                        incompleteNodes[node_name] = [child]
+                        incompleteNodes[node_name] = [[child, idx]]
 
 
 def update_incomplete_nodes():
@@ -60,22 +57,20 @@ def update_incomplete_nodes():
 
         # Check if all children have been created
         remaining_children_to_complete = []
-        for child in children:
+        for couple in children:
+            # A couple is the child name and its position in dad's children list
+            child_name = couple[0]
+            idx_child = couple[1]
 
             # If the child exists, just add it to the node children list
-            if nodes.get(child):
+            if nodes.get(child_name):
                 node = nodes.get(node_name)
-                if Node(node).children:
-                    children = nodes[node_name]
-                    children.append(child)
-                else:
-                    children = []
-                    children.append(child)
-                node.children = children
+                children = nodes[node_name].children
+                children[idx_child] = nodes.get(child_name)
 
             # Else, update the list of missing nodes
             else:
-                remaining_children_to_complete.append(child)
+                remaining_children_to_complete.append([child_name, idx_child])
 
         # If my node still needs to wait for its children to be created, put it back in the incomplete nodes list
         if len(remaining_children_to_complete) > 0:
