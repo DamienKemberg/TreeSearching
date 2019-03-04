@@ -1,42 +1,44 @@
 from node import Node
 from tree import Tree
-import json
+from typing import Dict, List, Union, TextIO
 
 
 # Declaring my nodes dictionaries
-nodes = {}
-incompleteNodes = {}
+nodes: Dict[str, Node] = {}
+incompleteNodes: Dict[str, List[List[Union[str, int]]]] = {}
 
 # Declaring my tree
-tree = Tree()
+tree: Tree = Tree()
 
 
+# Sorter which put leaves first in the list
 def leaves_first(value: str):
     return len(value.split(" "))
 
 
-def give_your_name(node: Node):
-    print(node.name)
+# A simple treatment on each node when running through the tree
+def give_your_name(current_node: Node):
+    print(current_node.name)
 
 
-def creating_nodes_from_file(file):
+def creating_nodes_from_file(file: TextIO):
 
-    lines = file.readlines()
+    lines: List[str] = file.readlines()
 
     lines.sort(key=leaves_first)
 
     for line in lines:
 
         # removing \n at the end of the line
-        line = line[:-1]
-        args = line.split(" ")
+        line: str = line[:-1]
+        args: List[str] = line.split(" ")
 
-        node_name = args[0]
+        node_name: str = args[0]
 
         nodes[node_name] = Node(node_name, 0, [None] * len(args[1:]) if len(args) > 1 else None)
 
         if len(args) > 1:
-            node_children_name = args[1:]
+            node_children_name: List[str] = args[1:]
 
             for idx, child in enumerate(node_children_name):
 
@@ -49,7 +51,7 @@ def creating_nodes_from_file(file):
                 else:
 
                     if incompleteNodes.get(node_name):
-                        children = incompleteNodes[node_name]
+                        children: List[List[Union[str, int]]] = incompleteNodes[node_name]
                         children.append([child, idx])
                     else:
                         incompleteNodes[node_name] = [[child, idx]]
@@ -61,17 +63,17 @@ def update_incomplete_nodes():
         node_name, children = incompleteNodes.popitem()
 
         # Check if all children have been created
-        remaining_children_to_complete = []
+        remaining_children_to_complete: List[List[Union[str, int]]] = []
         for couple in children:
             # A couple is the child name and its position in dad's children list
-            child_name = couple[0]
-            idx_child = couple[1]
+            child_name: str = couple[0]
+            idx_child: int = couple[1]
 
             # If the child exists, just add it to the node children list
             if nodes.get(child_name):
-                node = nodes.get(node_name)
-                children = nodes[node_name].children
-                nodes.get(child_name).increase_depth(node.depth)
+                current_node: Node = nodes.get(node_name)
+                children: List[Node] = nodes[node_name].children
+                nodes.get(child_name).increase_depth(current_node.depth)
                 children[idx_child] = nodes.get(child_name)
 
             # Else, update the list of missing nodes
@@ -84,14 +86,14 @@ def update_incomplete_nodes():
 
 
 def find_root():
-    for name, node in nodes.items():
-        if node.depth == 0:
-            return node
+    for node_name, current_node in nodes.items():
+        if current_node.depth == 0:
+            return current_node
     return None
 
 
 # Building tree
-tree_file = open("in/simpleTree.txt", "r")
+tree_file: TextIO = open("in/simpleTree.txt", "r")
 creating_nodes_from_file(tree_file)
 update_incomplete_nodes()
 tree.root = find_root()
