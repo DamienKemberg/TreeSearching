@@ -96,9 +96,18 @@ creating_nodes_from_file(tree_file)
 update_incomplete_nodes()
 tree.root = find_root()
 
+print("_____________________")
+print("My nodes :")
 for name, node in nodes.items():
     print(node.tostring())
 
+print("_____________________")
 print("Root is :", tree.root.name)
 
+print("_____________________")
+print("Depth-First Search :")
 tree.depth_first_search_from_root(give_your_name)
+
+print("_____________________")
+print("Breadth-First Search :")
+tree.breadth_first_search_from_root(give_your_name)
