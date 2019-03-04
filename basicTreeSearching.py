@@ -29,7 +29,7 @@ def creating_nodes_from_file(file):
 
         node_name = args[0]
 
-        nodes[node_name] = Node(node_name, args[1:] if len(args) > 1 else None)
+        nodes[node_name] = Node(node_name, 0, [None] * len(args[1:]) if len(args) > 1 else None)
 
         if len(args) > 1:
             node_children_name = args[1:]
@@ -38,6 +38,7 @@ def creating_nodes_from_file(file):
 
                 # If the child have already been created
                 if nodes.get(child):
+                    nodes[child].increase_depth(nodes[node_name].depth)
                     nodes[node_name].children[idx] = nodes[child]
 
                 # Else, we wait the end to complete the node
@@ -66,6 +67,7 @@ def update_incomplete_nodes():
             if nodes.get(child_name):
                 node = nodes.get(node_name)
                 children = nodes[node_name].children
+                nodes.get(child_name).increase_depth(node.depth)
                 children[idx_child] = nodes.get(child_name)
 
             # Else, update the list of missing nodes
@@ -76,15 +78,21 @@ def update_incomplete_nodes():
         if len(remaining_children_to_complete) > 0:
             incompleteNodes[node_name] = remaining_children_to_complete
 
-        # Found my tree root !
-        if len(incompleteNodes) == 1:
-            tree.root = nodes[node_name]
+
+def find_root():
+    for name, node in nodes.items():
+        if node.depth == 0:
+            return node
+    return None
 
 
 # Building tree
 tree_file = open("in/simpleTree.txt", "r")
 creating_nodes_from_file(tree_file)
 update_incomplete_nodes()
+tree.root = find_root()
 
 for name, node in nodes.items():
     print(node.tostring())
+
+print("Root is :", tree.root.name)

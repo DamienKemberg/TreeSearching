@@ -1,10 +1,11 @@
 class Node:
-    def __init__(self, name, children=None):
+    def __init__(self, name: str, depth=0, children=None):
         self.name = name
         self.children = children
+        self.depth = depth
 
     def tostring(self):
-        res = "Node " + self.name
+        res = "Node " + self.name + " depth = " + str(self.depth)
         if self.children and len(self.children) > 0:
             res += "\n\t" + "Children : "
 
@@ -14,3 +15,14 @@ class Node:
 
             return res[:-2]
         return res
+
+    def increase_children_depth(self):
+        if self.children and len(self.children) > 0:
+
+            for child in self.children:
+                if child:
+                    child.increase_depth(self.depth)
+
+    def increase_depth(self, depth):
+        self.depth = depth + 1
+        self.increase_children_depth()
